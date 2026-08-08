@@ -4,6 +4,9 @@ import os
 
 pygame.init()
 
+clock = pygame.time.Clock()
+FPS = 60
+
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
 
@@ -27,16 +30,28 @@ class Player():
         self.hight = 40
         self.rect = pygame.Rect(0,0,self.width,self.hight)
         self.rect.center = (x,y)
+        self.flip = False
+
+    def move(self):
+        key = pygame.key.get_pressed()
+        if key[pygame.K_a] and self.rect.x > 0 :
+            self.rect.x -= 7
+            self.flip = True
+        if key[pygame.K_d] and self.rect.x + self.width < SCREEN_WIDTH:
+            self.rect.x += 7 
+            self.flip = False
 
     def draw(self):
-        screen.blit(self.img ,( self.rect.x -12 , self.rect.y -5) )
+        screen.blit(pygame.transform.flip(self.img,self.flip,False) ,( self.rect.x -12 , self.rect.y -5) )
         pygame.draw.rect(screen,(0,0,0),self.rect , 2)
 
 jumpy = Player(SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
         
 
 while True:
+    clock.tick(FPS)
 
+    jumpy.move()
     screen.blit(bg_img,(0,0))
     jumpy.draw()
 
