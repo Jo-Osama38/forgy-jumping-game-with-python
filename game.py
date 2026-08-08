@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os 
+import random
 
 pygame.init()
 
@@ -22,6 +23,7 @@ pygame.display.set_caption("FORGGY JUPMING GAME")
 
 bg_img = pygame.image.load(pathing("assets/bg.png"))
 player_img= pygame.image.load(pathing("assets/jump.png"))
+wood_img = pygame.image.load(pathing("assets/wood.png"))
 
 GRAVIGY = 1 
 
@@ -36,7 +38,6 @@ class Player():
         self.vel_y = 0
 
     def move(self):
-
         dy =0
 
         key = pygame.key.get_pressed()
@@ -50,6 +51,15 @@ class Player():
         self.vel_y += GRAVIGY 
         dy += self.vel_y
 
+
+        for platform in platform_group:
+            if platform.rect.colliderect(self.rect.x ,self.rect.y + dy, self.width,self.hight):
+                if self.rect.bottom < platform.rect.centery:
+                    if self.vel_y > 0 :
+                        self.rect.bottom = platform.rect.top
+                        dy = 0 
+                        self.vel_y = -20
+
         if self.rect.bottom + dy > SCREEN_HEIGHT:
             dy = 0 
             self.vel_y = -20
@@ -58,16 +68,37 @@ class Player():
 
     def draw(self):
         screen.blit(pygame.transform.flip(self.img,self.flip,False) ,( self.rect.x -12 , self.rect.y -5) )
-        pygame.draw.rect(screen,(0,0,0),self.rect , 2)
+
+
+class Platform(pygame.sprite.Sprite):
+    def __init__(self,x,y,width):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.transform.scale(wood_img,(width,11))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+
+
+
 
 jumpy = Player(SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
-        
+
+platform_group = pygame.sprite.Group()
+for p in range(10):
+    p_w = random.randint(40,60)
+    p_x = random.randint(0,SCREEN_WIDTH - p_w )
+    p_y = p*random.randint(80,120)
+    platform = Platform(p_x,p_y,p_w)
+    platform_group.add(platform)
+
 
 while True:
     clock.tick(FPS)
 
     jumpy.move()
     screen.blit(bg_img,(0,0))
+    platform_group.draw(screen)
     jumpy.draw()
 
     for event in pygame.event.get():
