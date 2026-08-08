@@ -23,6 +23,8 @@ pygame.display.set_caption("FORGGY JUPMING GAME")
 bg_img = pygame.image.load(pathing("assets/bg.png"))
 player_img= pygame.image.load(pathing("assets/jump.png"))
 
+GRAVIGY = 1 
+
 class Player():
     def __init__(self,x,y):
         self.img =pygame.transform.scale(player_img,(45,45)) 
@@ -31,8 +33,12 @@ class Player():
         self.rect = pygame.Rect(0,0,self.width,self.hight)
         self.rect.center = (x,y)
         self.flip = False
+        self.vel_y = 0
 
     def move(self):
+
+        dy =0
+
         key = pygame.key.get_pressed()
         if key[pygame.K_a] and self.rect.x > 0 :
             self.rect.x -= 7
@@ -40,6 +46,15 @@ class Player():
         if key[pygame.K_d] and self.rect.x + self.width < SCREEN_WIDTH:
             self.rect.x += 7 
             self.flip = False
+
+        self.vel_y += GRAVIGY 
+        dy += self.vel_y
+
+        if self.rect.bottom + dy > SCREEN_HEIGHT:
+            dy = 0 
+            self.vel_y = -20
+
+        self.rect.y += dy
 
     def draw(self):
         screen.blit(pygame.transform.flip(self.img,self.flip,False) ,( self.rect.x -12 , self.rect.y -5) )
