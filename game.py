@@ -29,6 +29,7 @@ GRAVIGY = 1
 SCROLL_THEAM = 200
 scroll = 0
 bg_scroll = 0
+MAX_PLATFORM = 10
 
 def draw_bg(bg_scroll):
     screen.blit(bg_img,(0,0+bg_scroll))
@@ -97,6 +98,9 @@ class Platform(pygame.sprite.Sprite):
 
     def update(self, scroll):
         self.rect.y += scroll
+
+        if self.rect.y > SCREEN_HEIGHT:
+            self.kill()
        
 
 
@@ -105,12 +109,8 @@ class Platform(pygame.sprite.Sprite):
 jumpy = Player(SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
 
 platform_group = pygame.sprite.Group()
-for p in range(70):
-    p_w = random.randint(40,60)
-    p_x = random.randint(0,SCREEN_WIDTH - p_w )
-    p_y = p*random.randint(80,120) - 700
-    platform = Platform(p_x,p_y,p_w)
-    platform_group.add(platform)
+platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70 )
+platform_group.add(platform)
 
 
 while True:
@@ -121,7 +121,13 @@ while True:
     if bg_scroll > 600:
         bg_scroll = 0 
     draw_bg(bg_scroll)
-    pygame.draw.line(screen,(255,0,0),(0,SCROLL_THEAM),(SCREEN_WIDTH,SCROLL_THEAM))
+
+    if len(platform_group) < MAX_PLATFORM:
+        p_w = random.randint(40,70)
+        p_x = random.randint(0 , SCREEN_WIDTH - p_w)
+        p_y = platform.rect.y - random.randint(80,120)
+        platform = Platform(p_x , p_y , p_w)
+        platform_group.add(platform)
     platform_group.draw(screen)
     platform_group.update(scroll)
     jumpy.draw()
