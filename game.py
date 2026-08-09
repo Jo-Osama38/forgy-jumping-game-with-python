@@ -30,6 +30,17 @@ SCROLL_THEAM = 200
 scroll = 0
 bg_scroll = 0
 MAX_PLATFORM = 10
+game_over = False
+score = 0
+
+font_small = pygame.font.SysFont("Lucida Sans",20)
+font_big = pygame.font.SysFont("Lucida Sans",26)
+
+def draw_text (text , font,color, x,y):
+    img = font.render(text ,True,color)
+    screen.blit(img,(x,y))
+
+
 
 def draw_bg(bg_scroll):
     screen.blit(bg_img,(0,0+bg_scroll))
@@ -70,10 +81,6 @@ class Player():
                         self.rect.bottom = platform.rect.top
                         dy = 0 
                         self.vel_y = -20
-
-        if self.rect.bottom + dy > SCREEN_HEIGHT:
-            dy = 0 
-            self.vel_y = -20
 
         if self.rect.top <= SCROLL_THEAM:
             if self.vel_y < 0:
@@ -116,21 +123,43 @@ platform_group.add(platform)
 while True:
     clock.tick(FPS)
 
-    scroll = jumpy.move()
-    bg_scroll += scroll
-    if bg_scroll > 600:
-        bg_scroll = 0 
-    draw_bg(bg_scroll)
+    if not game_over:
+        scroll = jumpy.move()
+        bg_scroll += scroll
+        if bg_scroll > 600:
+            bg_scroll = 0 
+        draw_bg(bg_scroll)
 
-    if len(platform_group) < MAX_PLATFORM:
-        p_w = random.randint(40,70)
-        p_x = random.randint(0 , SCREEN_WIDTH - p_w)
-        p_y = platform.rect.y - random.randint(80,120)
-        platform = Platform(p_x , p_y , p_w)
-        platform_group.add(platform)
-    platform_group.draw(screen)
-    platform_group.update(scroll)
-    jumpy.draw()
+        if len(platform_group) < MAX_PLATFORM:
+            p_w = random.randint(40,70)
+            p_x = random.randint(0 , SCREEN_WIDTH - p_w)
+            p_y = platform.rect.y - random.randint(80,120)
+            platform = Platform(p_x , p_y , p_w)
+            platform_group.add(platform)
+        platform_group.draw(screen)
+        platform_group.update(scroll)
+        jumpy.draw()
+
+        if jumpy.rect.top > SCREEN_HEIGHT:
+            game_over = True
+
+    else:
+        draw_text("GAME OVER",font_big,(255,255,0),130,200)
+        draw_text("SCORE: "+str(score),font_big,(255,0,255),130,250)
+        draw_text("PRESS SPACE TO PLAY AGAIN",font_big,(0,255,255),40,300)
+        key = pygame.key.get_pressed()
+        if key[pygame.K_SPACE]:
+            game_over = False
+            score = 0
+            scroll = 0
+
+            jumpy.rect.center = (SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
+
+            platform_group.empty()
+
+            platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70 )
+            platform_group.add(platform)
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
