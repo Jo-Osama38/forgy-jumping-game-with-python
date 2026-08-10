@@ -21,9 +21,11 @@ def pathing(relative_path):
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption("FORGGY JUPMING GAME")
 
-bg_img = pygame.image.load(pathing("assets/bg.png"))
+
+bg_img = pygame.image.load(pathing("assets/bg.jpg"))
 player_img= pygame.image.load(pathing("assets/jump.png"))
-wood_img = pygame.image.load(pathing("assets/wood.png"))
+wood_img = pygame.image.load(pathing("assets/platform.png"))
+bg_img = pygame.transform.scale(bg_img,(400,600)) 
 
 GRAVIGY = 1 
 SCROLL_THEAM = 200
@@ -98,7 +100,9 @@ class Player():
 class Platform(pygame.sprite.Sprite):
     def __init__(self,x,y,width):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(wood_img,(width,11))
+        self.width = wood_img.get_width()
+        self.height = wood_img.get_height()
+        self.image = pygame.transform.scale(wood_img,(width,20))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -131,7 +135,7 @@ while True:
         draw_bg(bg_scroll)
 
         if len(platform_group) < MAX_PLATFORM:
-            p_w = random.randint(40,70)
+            p_w = random.randint(50,70)
             p_x = random.randint(0 , SCREEN_WIDTH - p_w)
             p_y = platform.rect.y - random.randint(80,120)
             platform = Platform(p_x , p_y , p_w)
