@@ -36,7 +36,13 @@ game_over = False
 score = 0
 fade_counter = 0 
 
-font_small = pygame.font.SysFont("Lucida Sans",20)
+if os.path.exists("score.txt"):
+    with open("score.txt" ,"r") as file:
+        high_score = int(file.read())
+else:
+    high_score = 0 
+
+font_small = pygame.font.SysFont("comicsans",20)
 font_big = pygame.font.SysFont("Lucida Sans",30)
 game_over_font = pygame.font.SysFont("Lucida Sans",40)
 
@@ -136,6 +142,12 @@ while True:
             bg_scroll = 0 
         draw_bg(bg_scroll)
 
+        if scroll > 0 :
+            score += scroll
+
+        pygame.draw.line(screen,(255,0,0),(0,score-high_score+SCROLL_THEAM),(SCREEN_WIDTH,score-high_score+SCROLL_THEAM),3)
+        draw_text("HIGH SCORE" ,font_small,(255,0,0),SCREEN_WIDTH-130,score-high_score+SCROLL_THEAM)
+
         if len(platform_group) < MAX_PLATFORM:
             p_w = random.randint(50,70)
             p_x = random.randint(0 , SCREEN_WIDTH - p_w)
@@ -145,6 +157,9 @@ while True:
         platform_group.draw(screen)
         platform_group.update(scroll)
         jumpy.draw()
+
+        draw_text("SCORE: "+str(score),font_small, (255,255,255),40,20)
+        
 
         if jumpy.rect.top > SCREEN_HEIGHT:
             game_over = True
@@ -157,9 +172,14 @@ while True:
             pygame.draw.rect(screen ,(0,0,0), (0,SCREEN_HEIGHT//2,fade_counter,SCREEN_HEIGHT/4))
             pygame.draw.rect(screen ,(0,0,0), (SCREEN_WIDTH - fade_counter,SCREEN_HEIGHT- SCREEN_HEIGHT//4 , SCREEN_WIDTH, SCREEN_HEIGHT /4))
 
-        draw_text("GAME OVER",game_over_font,(200,0,200),112,200)
+        draw_text("GAME OVER",game_over_font,(200 ,0,200),112,200)
         draw_text("SCORE: "+str(score),game_over_font,(0,150,150),130,280)
         draw_text("PRESS SPACE TO PLAY AGAIN",font_big,(0,155,155),40,360)
+
+        if score > high_score:
+            high_score = score
+            with open("score.txt","w") as file:
+                file.write(str(high_score))
         key = pygame.key.get_pressed()
         if key[pygame.K_SPACE]:
             game_over = False
