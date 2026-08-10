@@ -34,9 +34,11 @@ bg_scroll = 0
 MAX_PLATFORM = 10
 game_over = False
 score = 0
+fade_counter = 0 
 
 font_small = pygame.font.SysFont("Lucida Sans",20)
-font_big = pygame.font.SysFont("Lucida Sans",26)
+font_big = pygame.font.SysFont("Lucida Sans",30)
+game_over_font = pygame.font.SysFont("Lucida Sans",40)
 
 def draw_text (text , font,color, x,y):
     img = font.render(text ,True,color)
@@ -148,14 +150,22 @@ while True:
             game_over = True
 
     else:
-        draw_text("GAME OVER",font_big,(255,255,0),130,200)
-        draw_text("SCORE: "+str(score),font_big,(255,0,255),130,250)
-        draw_text("PRESS SPACE TO PLAY AGAIN",font_big,(0,255,255),40,300)
+        if fade_counter < SCREEN_WIDTH:
+            fade_counter += 5
+            pygame.draw.rect(screen ,(0,0,0), (0,0,fade_counter,SCREEN_HEIGHT/4))
+            pygame.draw.rect(screen ,(0,0,0), (SCREEN_WIDTH - fade_counter,SCREEN_HEIGHT//4 , SCREEN_WIDTH, SCREEN_HEIGHT /4))
+            pygame.draw.rect(screen ,(0,0,0), (0,SCREEN_HEIGHT//2,fade_counter,SCREEN_HEIGHT/4))
+            pygame.draw.rect(screen ,(0,0,0), (SCREEN_WIDTH - fade_counter,SCREEN_HEIGHT- SCREEN_HEIGHT//4 , SCREEN_WIDTH, SCREEN_HEIGHT /4))
+
+        draw_text("GAME OVER",game_over_font,(200,0,200),112,200)
+        draw_text("SCORE: "+str(score),game_over_font,(0,150,150),130,280)
+        draw_text("PRESS SPACE TO PLAY AGAIN",font_big,(0,155,155),40,360)
         key = pygame.key.get_pressed()
         if key[pygame.K_SPACE]:
             game_over = False
             score = 0
             scroll = 0
+            fade_counter = 0
 
             jumpy.rect.center = (SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
 
@@ -163,6 +173,7 @@ while True:
 
             platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70 )
             platform_group.add(platform)
+            
 
 
     for event in pygame.event.get():
