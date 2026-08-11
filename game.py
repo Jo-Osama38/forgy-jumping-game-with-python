@@ -43,12 +43,12 @@ else:
     high_score = 0 
 
 font_small = pygame.font.SysFont("comicsans",20)
-font_big = pygame.font.SysFont("Lucida Sans",30)
-game_over_font = pygame.font.SysFont("Lucida Sans",40)
+font_big = pygame.font.SysFont("comicsans",30)
+game_over_font = pygame.font.SysFont("comicsans",60)
 
 def draw_text (text , font,color, x,y):
     img = font.render(text ,True,color)
-    screen.blit(img,(x,y))
+    screen.blit(img,(x-img.get_width() // 2,y))
 
 
 
@@ -106,7 +106,7 @@ class Player():
 
 
 class Platform(pygame.sprite.Sprite):
-    def __init__(self,x,y,width):
+    def __init__(self,x,y,width,moving):
         pygame.sprite.Sprite.__init__(self)
         self.width = wood_img.get_width()
         self.height = wood_img.get_height()
@@ -114,8 +114,23 @@ class Platform(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.moving = moving
+        self.speed_moveing = random.randint(1,2)
+        self.move_counter = random.randint(0,50)
+        self.move_direction = random.choice([-self.speed_moveing,self.speed_moveing])
+
 
     def update(self, scroll):
+        if self.moving :
+            self.move_counter += 1 
+            self.rect.x += self.move_direction
+        if self.move_counter >= 100  or self.rect.right > SCREEN_WIDTH or self.rect.left < 0:
+             self.move_direction *= -1 
+             self.move_counter = 0
+
+
+
+
         self.rect.y += scroll
 
         if self.rect.y > SCREEN_HEIGHT:
@@ -128,7 +143,7 @@ class Platform(pygame.sprite.Sprite):
 jumpy = Player(SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
 
 platform_group = pygame.sprite.Group()
-platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70 )
+platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70 ,False)
 platform_group.add(platform)
 
 
@@ -145,21 +160,24 @@ while True:
         if scroll > 0 :
             score += scroll
 
-        pygame.draw.line(screen,(255,0,0),(0,score-high_score+SCROLL_THEAM),(SCREEN_WIDTH,score-high_score+SCROLL_THEAM),3)
-        draw_text("HIGH SCORE" ,font_small,(255,0,0),SCREEN_WIDTH-130,score-high_score+SCROLL_THEAM)
-
         if len(platform_group) < MAX_PLATFORM:
             p_w = random.randint(50,70)
             p_x = random.randint(0 , SCREEN_WIDTH - p_w)
             p_y = platform.rect.y - random.randint(80,120)
-            platform = Platform(p_x , p_y , p_w)
+            if score > 500:
+                p_moving = random.choice([False,True,False])
+            else:p_moving = False
+
+            platform = Platform(p_x , p_y , p_w , p_moving)
             platform_group.add(platform)
         platform_group.draw(screen)
         platform_group.update(scroll)
         jumpy.draw()
 
-        draw_text("SCORE: "+str(score),font_small, (255,255,255),40,20)
-        
+        draw_text("SCORE: "+str(score),font_small, (255,255,255),80,20)
+
+        pygame.draw.line(screen,(255,0,0),(0,score-high_score+SCROLL_THEAM),(SCREEN_WIDTH,score-high_score+SCROLL_THEAM),3)
+        draw_text("HIGH SCORE" ,font_small,(255,0,0),330,score-high_score+SCROLL_THEAM)
 
         if jumpy.rect.top > SCREEN_HEIGHT:
             game_over = True
@@ -171,33 +189,41 @@ while True:
             pygame.draw.rect(screen ,(0,0,0), (SCREEN_WIDTH - fade_counter,SCREEN_HEIGHT//4 , SCREEN_WIDTH, SCREEN_HEIGHT /4))
             pygame.draw.rect(screen ,(0,0,0), (0,SCREEN_HEIGHT//2,fade_counter,SCREEN_HEIGHT/4))
             pygame.draw.rect(screen ,(0,0,0), (SCREEN_WIDTH - fade_counter,SCREEN_HEIGHT- SCREEN_HEIGHT//4 , SCREEN_WIDTH, SCREEN_HEIGHT /4))
+        else:
 
-        draw_text("GAME OVER",game_over_font,(200 ,0,200),112,200)
-        draw_text("SCORE: "+str(score),game_over_font,(0,150,150),130,280)
-        draw_text("PRESS SPACE TO PLAY AGAIN",font_big,(0,155,155),40,360)
+            if score > high_score:
+                high_score = score
+                with open("score.txt","w") as file:
+                    file.write(str(high_score))
+                 
+            
+            draw_text("GAME OVER",game_over_font,(200 ,0,200),200,150)
+            draw_text("HIGH SCORE: "+str(high_score),font_big,(0,150,150),200,270)
+            draw_text("SCORE: "+str(score),font_big,(0,150,150),200,320)
+            draw_text("PRESS SPACE TO PLAY AGAIN",font_small,(0,155,155),200,400)
 
-        if score > high_score:
-            high_score = score
-            with open("score.txt","w") as file:
-                file.write(str(high_score))
-        key = pygame.key.get_pressed()
-        if key[pygame.K_SPACE]:
-            game_over = False
-            score = 0
-            scroll = 0
-            fade_counter = 0
+            key = pygame.key.get_pressed()
+            if key[pygame.K_SPACE]:
+                game_over = False
+                score = 0
+                scroll = 0
+                fade_counter = 0
 
-            jumpy.rect.center = (SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
+                jumpy.rect.center = (SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
 
-            platform_group.empty()
+                platform_group.empty()
 
-            platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70 )
-            platform_group.add(platform)
+                platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70,False )
+                platform_group.add(platform)
             
 
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            if score > high_score:
+                high_score = score
+                with open("score.txt","w") as file:
+                    file.write(str(high_score))
             quit()
 
     pygame.display.update()
