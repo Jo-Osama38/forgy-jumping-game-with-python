@@ -2,6 +2,8 @@ import pygame
 import sys
 import os 
 import random
+from enemy import Enemy
+
 
 pygame.init()
 
@@ -26,6 +28,11 @@ bg_img = pygame.image.load(pathing("assets/bg.jpg"))
 player_img= pygame.image.load(pathing("assets/jump.png"))
 wood_img = pygame.image.load(pathing("assets/platform.png"))
 bg_img = pygame.transform.scale(bg_img,(400,600)) 
+bird1_img = pygame.image.load(pathing("assets/bird1.png"))
+bird1_img = pygame.transform.scale(bird1_img,(45,40))
+bird2_img = pygame.image.load(pathing("assets/bird2.png"))
+bird2_img = pygame.transform.scale(bird2_img,(45,40))
+imgList = [bird1_img,bird2_img]
 
 GRAVIGY = 1 
 SCROLL_THEAM = 200
@@ -143,6 +150,9 @@ class Platform(pygame.sprite.Sprite):
 jumpy = Player(SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
 
 platform_group = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
+
+
 platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70 ,False)
 platform_group.add(platform)
 
@@ -170,8 +180,15 @@ while True:
 
             platform = Platform(p_x , p_y , p_w , p_moving)
             platform_group.add(platform)
+        if len(enemy_group) == 0:
+                    enemy = Enemy(SCREEN_WIDTH,100,bird1_img,imgList)
+                    enemy_group.add(enemy)
+
+        enemy_group.update(SCREEN_WIDTH,scroll)
+        
         platform_group.draw(screen)
         platform_group.update(scroll)
+        enemy_group.draw(screen)
         jumpy.draw()
 
         draw_text("SCORE: "+str(score),font_small, (255,255,255),80,20)
@@ -212,6 +229,7 @@ while True:
                 jumpy.rect.center = (SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
 
                 platform_group.empty()
+                enemy_group.empty()
 
                 platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70,False )
                 platform_group.add(platform)
