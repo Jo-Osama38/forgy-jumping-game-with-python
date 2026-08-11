@@ -32,7 +32,10 @@ bird1_img = pygame.image.load(pathing("assets/bird1.png"))
 bird1_img = pygame.transform.scale(bird1_img,(45,40))
 bird2_img = pygame.image.load(pathing("assets/bird2.png"))
 bird2_img = pygame.transform.scale(bird2_img,(45,40))
-imgList = [bird1_img,bird2_img]
+enemy3 = [bird1_img,bird2_img]
+enemy2 = [pygame.transform.scale(pygame.image.load(pathing("assets/frame-1.png")),(45,40)),pygame.transform.scale(pygame.image.load(pathing("assets/frame-2.png")),(45,40)),
+             pygame.transform.scale(pygame.image.load(pathing("assets/frame-3.png")),(45,40)),pygame.transform.scale(pygame.image.load(pathing("assets/frame-4.png")),(45,40))]
+enemy1 =[pygame.transform.scale(pygame.image.load(pathing("assets/enemy.png")),(45,40)) , pygame.transform.scale(pygame.image.load(pathing("assets/enemy2.png")),(45,40))]
 
 GRAVIGY = 1 
 SCROLL_THEAM = 200
@@ -170,6 +173,13 @@ while True:
         if scroll > 0 :
             score += scroll
 
+        enemy = enemy1
+        if score > 2500:
+            enemy = enemy2
+        elif score > 5000:
+            enemy = enemy3
+        
+
         if len(platform_group) < MAX_PLATFORM:
             p_w = random.randint(50,70)
             p_x = random.randint(0 , SCREEN_WIDTH - p_w)
@@ -181,7 +191,7 @@ while True:
             platform = Platform(p_x , p_y , p_w , p_moving)
             platform_group.add(platform)
         if len(enemy_group) == 0:
-                    enemy = Enemy(SCREEN_WIDTH,100,bird1_img,imgList)
+                    enemy = Enemy(SCREEN_WIDTH,100,enemy,score)
                     enemy_group.add(enemy)
 
         enemy_group.update(SCREEN_WIDTH,scroll)
