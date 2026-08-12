@@ -83,10 +83,10 @@ class Player():
         scroll = 0
 
         key = pygame.key.get_pressed()
-        if key[pygame.K_a] and self.rect.x > 0 :
+        if key[pygame.K_a] and self.rect.x > 0  or key[pygame.K_LEFT] and self.rect.x>0:
             self.rect.x -= 7
             self.flip = True
-        if key[pygame.K_d] and self.rect.x + self.width < SCREEN_WIDTH:
+        if key[pygame.K_d] and self.rect.x + self.width < SCREEN_WIDTH or key[pygame.K_RIGHT] and self.rect.x + self.width < SCREEN_WIDTH:
             self.rect.x += 7 
             self.flip = False
 
@@ -107,6 +107,8 @@ class Player():
                 scroll = -dy
         
         self.rect.y += dy + scroll
+
+        self.mask = pygame.mask.from_surface(self.img)
 
         return scroll
 
@@ -174,9 +176,9 @@ while True:
             score += scroll
 
         enemy = enemy1
-        if score > 2500:
+        if score > 2100:
             enemy = enemy2
-        elif score > 5000:
+        elif score > 3000:
             enemy = enemy3
         
 
@@ -190,7 +192,7 @@ while True:
 
             platform = Platform(p_x , p_y , p_w , p_moving)
             platform_group.add(platform)
-        if len(enemy_group) == 0:
+        if len(enemy_group) == 0 and score > 1500:
                     enemy = Enemy(SCREEN_WIDTH,100,enemy,score)
                     enemy_group.add(enemy)
 
@@ -208,6 +210,9 @@ while True:
 
         if jumpy.rect.top > SCREEN_HEIGHT:
             game_over = True
+        if pygame.sprite.spritecollide(jumpy,enemy_group,False):
+            if pygame.sprite.spritecollide(jumpy,enemy_group,False,pygame.sprite.collide_mask):
+               game_over = True
 
     else:
         if fade_counter < SCREEN_WIDTH:
