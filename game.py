@@ -24,6 +24,14 @@ screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption("FORGGY JUPMING GAME")
 
 
+jump_sound = pygame.mixer.Sound(pathing("assets/jump.mp3"))
+jump_sound.set_volume(0.5)
+death_sound = pygame.mixer.Sound(pathing("assets/death.mp3"))
+death_sound.set_volume(0.5)
+try_again_sound = pygame.mixer.Sound(pathing("assets/try_again.mp3"))
+try_again_sound.set_volume(0.5)
+
+
 bg_img = pygame.image.load(pathing("assets/bg.jpg"))
 player_img= pygame.image.load(pathing("assets/jump.png"))
 wood_img = pygame.image.load(pathing("assets/platform.png"))
@@ -101,6 +109,7 @@ class Player():
                         self.rect.bottom = platform.rect.top
                         dy = 0 
                         self.vel_y = -20
+                        jump_sound.play()
 
         if self.rect.top <= SCROLL_THEAM:
             if self.vel_y < 0:
@@ -210,9 +219,15 @@ while True:
 
         if jumpy.rect.top > SCREEN_HEIGHT:
             game_over = True
+            death_sound.play()
+            try_again_sound.play()
+
         if pygame.sprite.spritecollide(jumpy,enemy_group,False):
             if pygame.sprite.spritecollide(jumpy,enemy_group,False,pygame.sprite.collide_mask):
-               game_over = True
+                game_over = True
+                death_sound.play()
+                try_again_sound.play()
+
 
     else:
         if fade_counter < SCREEN_WIDTH:
@@ -221,8 +236,9 @@ while True:
             pygame.draw.rect(screen ,(0,0,0), (SCREEN_WIDTH - fade_counter,SCREEN_HEIGHT//4 , SCREEN_WIDTH, SCREEN_HEIGHT /4))
             pygame.draw.rect(screen ,(0,0,0), (0,SCREEN_HEIGHT//2,fade_counter,SCREEN_HEIGHT/4))
             pygame.draw.rect(screen ,(0,0,0), (SCREEN_WIDTH - fade_counter,SCREEN_HEIGHT- SCREEN_HEIGHT//4 , SCREEN_WIDTH, SCREEN_HEIGHT /4))
+            
         else:
-
+            
             if score > high_score:
                 high_score = score
                 with open("score.txt","w") as file:
