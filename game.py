@@ -53,6 +53,7 @@ MAX_PLATFORM = 10
 game_over = False
 score = 0
 fade_counter = 0 
+sound_played = False
 
 if os.path.exists("score.txt"):
     with open("score.txt" ,"r") as file:
@@ -184,10 +185,10 @@ while True:
         if scroll > 0 :
             score += scroll
 
-        enemy = enemy1
-        if score > 2100:
+        enemy = enemy3
+        if score > 2500:
             enemy = enemy2
-        elif score > 3000:
+        elif score > 3500:
             enemy = enemy3
         
 
@@ -220,13 +221,12 @@ while True:
         if jumpy.rect.top > SCREEN_HEIGHT:
             game_over = True
             death_sound.play()
-            try_again_sound.play()
+             
 
         if pygame.sprite.spritecollide(jumpy,enemy_group,False):
             if pygame.sprite.spritecollide(jumpy,enemy_group,False,pygame.sprite.collide_mask):
                 game_over = True
                 death_sound.play()
-                try_again_sound.play()
 
 
     else:
@@ -238,17 +238,21 @@ while True:
             pygame.draw.rect(screen ,(0,0,0), (SCREEN_WIDTH - fade_counter,SCREEN_HEIGHT- SCREEN_HEIGHT//4 , SCREEN_WIDTH, SCREEN_HEIGHT /4))
             
         else:
-            
             if score > high_score:
                 high_score = score
                 with open("score.txt","w") as file:
                     file.write(str(high_score))
-                 
+            if not sound_played:
+                            try_again_sound.play()
+                            sound_played = True   
             
             draw_text("GAME OVER",game_over_font,(200 ,0,200),200,150)
             draw_text("HIGH SCORE: "+str(high_score),font_big,(0,150,150),200,270)
             draw_text("SCORE: "+str(score),font_big,(0,150,150),200,320)
             draw_text("PRESS SPACE TO PLAY AGAIN",font_small,(0,155,155),200,400)
+
+           
+
 
             key = pygame.key.get_pressed()
             if key[pygame.K_SPACE]:
@@ -256,6 +260,7 @@ while True:
                 score = 0
                 scroll = 0
                 fade_counter = 0
+                sound_played = False
 
                 jumpy.rect.center = (SCREEN_WIDTH//2 , SCREEN_HEIGHT - 150)
 
@@ -264,6 +269,8 @@ while True:
 
                 platform = Platform(SCREEN_WIDTH // 2 -35 ,SCREEN_HEIGHT -50 , 70,False )
                 platform_group.add(platform)
+
+
             
 
 

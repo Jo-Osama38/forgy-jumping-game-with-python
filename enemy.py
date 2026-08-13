@@ -5,9 +5,9 @@ class Enemy (pygame.sprite.Sprite):
     def __init__(self, SCREEN_WIDTH ,y ,imgList,score):
         pygame.sprite.Sprite.__init__(self)
         if len(imgList) == 2 :
-            if score < 2100:
+            if score < 2500:
                 self.direction = random.choice([-2,2])
-            elif score > 3000:
+            elif score > 3500:
                 self.direction = random.choice([-4,4])
             else:
                 self.direction = random.choice([-3,3])
