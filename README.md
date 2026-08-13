@@ -78,7 +78,7 @@ In Releases, download the `game_for_windows.zip` file.
 
 
 # Images
-![image1.png]()
-![image2.png]()
-![image3.png]()
+![image1.png](image1.png)
+![image2.png](image2.png)
+![image3.png](image3.png)
 
